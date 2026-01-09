@@ -989,7 +989,7 @@ def update_user():
     return jsonify({"ok": False, "err": "Invalid data"})
 
 if __name__ == "__main__":
-    web_port = int(os.environ.get("WEB_PORT", "19432"))
+    web_port = int(os.environ.get("WEB_PORT", "19623"))
     app.run(host="0.0.0.0", port=web_port)
 PY
 
