@@ -358,7 +358,7 @@ def get_server_ip():
         except:
             pass
         # Final fallback
-        return "43.249.33.233"
+        return "43.228.86.50"
 
 def load_html_template():
     """Load HTML template from local file"""
