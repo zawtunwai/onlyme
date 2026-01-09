@@ -194,7 +194,7 @@ fi
 
 # Get Telegram Bot Token (optional)
 read -r -p "Telegram Bot Token (Optional, Enter=Skip): " BOT_TOKEN
-BOT_TOKEN="${BOT_TOKEN:-8527370918:AAE2nwR-z4rwkcW0QjEw_TGo8YmyKkx1aAw}"
+BOT_TOKEN="${BOT_TOKEN:-7894483756:AAHLpR58Pkrf9OY5d10LC4gMWyzyfYu1T5A}"
 
 {
   echo "WEB_ADMIN_USER=${WEB_USER}"
@@ -376,7 +376,7 @@ FALLBACK_HTML = """
 <html lang="{{lang}}">
 <head>
     <meta charset="utf-8">
-    <title>{{t.title}} - Channel 404</title>
+    <title>{{t.title}} - မောင်သုည</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta http-equiv="refresh" content="120">
     <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap" rel="stylesheet">
@@ -1181,7 +1181,7 @@ def update_bandwidth(username):
     return jsonify({"message": "Bandwidth updated"})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8081)
+    app.run(host='0.0.0.0', port=19591)
 PY
 
 # ===== Daily Cleanup Script =====
@@ -1616,7 +1616,7 @@ ufw allow 1:65535/udp >/dev/null 2>&1 || true
 # ufw allow 22/tcp >/dev/null 2>&1 || true
 # ufw allow 5667/udp >/dev/null 2>&1 || true
 # ufw allow 6000:19999/udp >/dev/null 2>&1 || true
-# ufw allow 19432/tcp >/dev/null 2>&1 || true
+# ufw allow 19591/tcp >/dev/null 2>&1 || true
 # ufw allow 8081/tcp >/dev/null 2>&1 || true
 ufw --force enable >/dev/null 2>&1 || true
 
@@ -1675,7 +1675,7 @@ chmod 600 /etc/zivpn/* 2>/dev/null || true
 IP=$(hostname -I | awk '{print $1}')
 echo -e "\n$LINE\n${G}✅ ZIVPN Enterprise Edition Completed!${Z}"
 echo -e "${C}🔒 SOURCE CODE PROTECTION: ${G}ACTIVATED${Z}"
-echo -e "${C}🌐 WEB PANEL:${Z} ${Y}http://$IP:19432${Z}"
+echo -e "${C}🌐 WEB PANEL:${Z} ${Y}http://$IP:19591${Z}"
 echo -e "\n${G}🔐 LOGIN CREDENTIALS${Z}"
 echo -e "  ${Y}• Username:${Z} ${Y}$WEB_USER${Z}"
 echo -e "  ${Y}• Password:${Z} ${Y}$WEB_PASS${Z}"
