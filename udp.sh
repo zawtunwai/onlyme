@@ -1610,15 +1610,17 @@ iptables -t nat -F
 iptables -t nat -A PREROUTING -i "$IFACE" -p udp --dport 6000:19999 -j DNAT --to-destination :5667
 iptables -t nat -A POSTROUTING -o "$IFACE" -j MASQUERADE
 
-# UFW Rules
-ufw allow 1:65535/tcp >/dev/null 2>&1 || true
-ufw allow 1:65535/udp >/dev/null 2>&1 || true
-# ufw allow 22/tcp >/dev/null 2>&1 || true
-# ufw allow 5667/udp >/dev/null 2>&1 || true
-# ufw allow 6000:19999/udp >/dev/null 2>&1 || true
-# ufw allow 19623/tcp >/dev/null 2>&1 || true
-# ufw allow 8081/tcp >/dev/null 2>&1 || true
+# UFW Rules - DNSTT Safe Version
+ufw allow 22/tcp >/dev/null 2>&1 || true                    # SSH Port
+ufw allow 53/tcp >/dev/null 2>&1 || true                    # DNSTT TCP (အရေးကြီး)
+ufw allow 53/udp >/dev/null 2>&1 || true                    # DNSTT UDP (အရေးကြီး)
+ufw allow 5667/udp >/dev/null 2>&1 || true                  # ZIVPN Main UDP Port
+ufw allow 6000:19999/udp >/dev/null 2>&1 || true           # User UDP Port Range
+ufw allow 19623/tcp >/dev/null 2>&1 || true                # Web Panel Port
+ufw allow 8081/tcp >/dev/null 2>&1 || true                 # API Port
 ufw --force enable >/dev/null 2>&1 || true
+
+echo -e "${G}✅ Firewall rules set (DNSTT Safe Mode)${Z}"
 
 # ===== Final Setup =====
 say "${Y}🔧 Final Configuration ပြုလုပ်နေပါတယ်...${Z}"
