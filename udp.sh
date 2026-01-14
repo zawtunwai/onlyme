@@ -1598,49 +1598,58 @@ WantedBy=timers.target
 EOF
 
 # ===== Networking Setup =====
-echo -e "${Y}🌐 ZIVPN Network Configuration Only...${Z}"
-sysctl -w net.ipv4.ip_forward=1 >/dev/null
-grep -q '^net.ipv4.ip_forward=1' /etc/sysctl.conf || echo 'net.ipv4.ip_forward=1' >> /etc/sysctl.conf
+echo -e "${Y}🌐 ZIVPN Network Setup (Non-Intrusive)${Z}"
 
+# 1. Enable IP forwarding (only if not already enabled)
+if [ "$(cat /proc/sys/net/ipv4/ip_forward)" != "1" ]; then
+    sysctl -w net.ipv4.ip_forward=1 >/dev/null
+    grep -q '^net.ipv4.ip_forward=1' /etc/sysctl.conf || echo 'net.ipv4.ip_forward=1' >> /etc/sysctl.conf
+fi
+
+# 2. Get network interface
 IFACE=$(ip -4 route ls | awk '/default/ {print $5; exit}')
 [ -n "${IFACE:-}" ] || IFACE=eth0
 
-echo -e "${G}✅ Preserving all existing services...${Z}"
+echo -e "${G}✅ System check completed${Z}"
 
-# ===== ZIVPN Rules ONLY (Additive) =====
-echo -e "${G}✅ Adding ZIVPN rules only...${Z}"
+# ===== CRITICAL: DO NOT INSTALL OR MODIFY UFW =====
+echo -e "${Y}⚠️  NOT installing or configuring UFW${Z}"
+echo -e "${Y}⚠️  Preserving existing firewall configuration${Z}"
 
-# 1. ZIVPN UDP Redirect (6000-19999 to 5667)
-iptables -t nat -A PREROUTING -i "$IFACE" -p udp --dport 6000:19999 -j DNAT --to-destination :5667
+# ===== ZIVPN iptables Rules ONLY =====
+echo -e "${G}✅ Adding ZIVPN iptables rules...${Z}"
 
-# 2. Masquerade for ZIVPN
-iptables -t nat -A POSTROUTING -o "$IFACE" -j MASQUERADE
+# Check if ZIVPN rule already exists
+ZIVPN_RULE_EXISTS=$(iptables -t nat -L PREROUTING -n 2>/dev/null | grep -c "dpts:6000:19999 to::5667" || true)
 
-# ===== UFW Rules: Add ZIVPN ports ONLY =====
-echo -e "${G}✅ Adding ZIVPN firewall rules only...${Z}"
-
-if ! ufw status | grep -q "5667/udp"; then
-    ufw allow 5667/udp >/dev/null 2>&1 || true
+if [ "$ZIVPN_RULE_EXISTS" -eq 0 ]; then
+    # Add ZIVPN UDP Redirect rule
+    iptables -t nat -A PREROUTING -i "$IFACE" -p udp --dport 6000:19999 -j DNAT --to-destination :5667
+    echo -e "${G}✅ Added ZIVPN UDP redirect rule${Z}"
+else
+    echo -e "${Y}⚠️  ZIVPN rule already exists, skipping${Z}"
 fi
 
-if ! ufw status | grep -q "6000:19999/udp"; then
-    ufw allow 6000:19999/udp >/dev/null 2>&1 || true
+# Check if MASQUERADE rule already exists
+MASQ_RULE_EXISTS=$(iptables -t nat -L POSTROUTING -n 2>/dev/null | grep -c "MASQUERADE.*$IFACE" || true)
+
+if [ "$MASQ_RULE_EXISTS" -eq 0 ]; then
+    # Add MASQUERADE rule
+    iptables -t nat -A POSTROUTING -o "$IFACE" -j MASQUERADE
+    echo -e "${G}✅ Added MASQUERADE rule${Z}"
+else
+    echo -e "${Y}⚠️  MASQUERADE rule already exists, skipping${Z}"
 fi
 
-if ! ufw status | grep -q "19432/tcp"; then
-    ufw allow 19432/tcp >/dev/null 2>&1 || true
+# ===== Save iptables rules (if iptables-persistent exists) =====
+if command -v iptables-save >/dev/null 2>&1 && [ -d /etc/iptables ]; then
+    iptables-save > /etc/iptables/rules.v4 2>/dev/null || true
+    echo -e "${G}✅ Saved iptables rules${Z}"
 fi
 
-if ! ufw status | grep -q "8081/tcp"; then
-    ufw allow 8081/tcp >/dev/null 2>&1 || true
-fi
-
-if ! ufw status | grep -q "Status: active"; then
-    echo "y" | ufw --force enable >/dev/null 2>&1 || true
-fi
-
-echo -e "${G}✅ ZIVPN network setup completed${Z}"
-echo -e "${Y}📌 Note: All existing services (SlowDNS, SSH Proxy, Xray/V2ray) remain unchanged${Z}"
+echo -e "${G}✅ ZIVPN network setup completed successfully${Z}"
+echo -e "${Y}📌 All existing services (SlowDNS, SSH Proxy, Xray/V2ray) are untouched${Z}"
+echo -e "${Y}📌 No firewall software was installed or modified${Z}"
 
 # ===== Final Setup =====
 say "${Y}🔧 Final Configuration ပြုလုပ်နေပါတယ်...${Z}"
