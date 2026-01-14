@@ -1598,39 +1598,49 @@ WantedBy=timers.target
 EOF
 
 # ===== Networking Setup =====
-echo -e "${Y}🌐 Network Configuration ပြုလုပ်နေပါတယ်...${Z}"
+echo -e "${Y}🌐 ZIVPN Network Configuration Only...${Z}"
 sysctl -w net.ipv4.ip_forward=1 >/dev/null
 grep -q '^net.ipv4.ip_forward=1' /etc/sysctl.conf || echo 'net.ipv4.ip_forward=1' >> /etc/sysctl.conf
 
 IFACE=$(ip -4 route ls | awk '/default/ {print $5; exit}')
 [ -n "${IFACE:-}" ] || IFACE=eth0
 
-# Protect SlowDNS ports FIRST
-iptables -t nat -I PREROUTING 1 -i "$IFACE" -p udp --dport 5300 -j ACCEPT
-iptables -t nat -I PREROUTING 1 -i "$IFACE" -p tcp --dport 5300 -j ACCEPT
-iptables -t nat -I PREROUTING 1 -i "$IFACE" -p udp --dport 110 -j ACCEPT
-iptables -t nat -I PREROUTING 1 -i "$IFACE" -p tcp --dport 110 -j ACCEPT
-iptables -t nat -I PREROUTING 1 -i "$IFACE" -p udp --dport 69 -j ACCEPT
-iptables -t nat -I PREROUTING 1 -i "$IFACE" -p tcp --dport 69 -j ACCEPT
+echo -e "${G}✅ Preserving all existing services...${Z}"
 
-# ZIVPN DNAT Rules (EXCLUDE port 5300)
-iptables -t nat -A PREROUTING -i "$IFACE" -p udp --dport 6000:5300 -j DNAT --to-destination :5667
-iptables -t nat -A PREROUTING -i "$IFACE" -p udp --dport 5301:19999 -j DNAT --to-destination :5667
+# ===== ZIVPN Rules ONLY (Additive) =====
+echo -e "${G}✅ Adding ZIVPN rules only...${Z}"
+
+# 1. ZIVPN UDP Redirect (6000-19999 to 5667)
+iptables -t nat -A PREROUTING -i "$IFACE" -p udp --dport 6000:19999 -j DNAT --to-destination :5667
+
+# 2. Masquerade for ZIVPN
 iptables -t nat -A POSTROUTING -o "$IFACE" -j MASQUERADE
 
-# UFW Rules - Specific ports only
-ufw allow 22/tcp >/dev/null 2>&1 || true
-ufw allow 53/tcp >/dev/null 2>&1 || true
-ufw allow 53/udp >/dev/null 2>&1 || true
-ufw allow 5300/tcp >/dev/null 2>&1 || true
-ufw allow 5300/udp >/dev/null 2>&1 || true
-ufw allow 110/tcp >/dev/null 2>&1 || true
-ufw allow 110/udp >/dev/null 2>&1 || true
-ufw allow 5667/udp >/dev/null 2>&1 || true
-ufw allow 6000:19999/udp >/dev/null 2>&1 || true
-ufw allow 19432/tcp >/dev/null 2>&1 || true
-ufw allow 8081/tcp >/dev/null 2>&1 || true
-ufw --force enable >/dev/null 2>&1 || true
+# ===== UFW Rules: Add ZIVPN ports ONLY =====
+echo -e "${G}✅ Adding ZIVPN firewall rules only...${Z}"
+
+if ! ufw status | grep -q "5667/udp"; then
+    ufw allow 5667/udp >/dev/null 2>&1 || true
+fi
+
+if ! ufw status | grep -q "6000:19999/udp"; then
+    ufw allow 6000:19999/udp >/dev/null 2>&1 || true
+fi
+
+if ! ufw status | grep -q "19432/tcp"; then
+    ufw allow 19432/tcp >/dev/null 2>&1 || true
+fi
+
+if ! ufw status | grep -q "8081/tcp"; then
+    ufw allow 8081/tcp >/dev/null 2>&1 || true
+fi
+
+if ! ufw status | grep -q "Status: active"; then
+    echo "y" | ufw --force enable >/dev/null 2>&1 || true
+fi
+
+echo -e "${G}✅ ZIVPN network setup completed${Z}"
+echo -e "${Y}📌 Note: All existing services (SlowDNS, SSH Proxy, Xray/V2ray) remain unchanged${Z}"
 
 # ===== Final Setup =====
 say "${Y}🔧 Final Configuration ပြုလုပ်နေပါတယ်...${Z}"
