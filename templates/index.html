@@ -49,16 +49,32 @@ html,body{
 
 /* Modern Header - Rainbow Gradient */
 .header {
-    background: var(--gradient);
+    background: linear-gradient(
+        135deg,
+        #ff0000 0%,    /* Red */
+        #ff8800 12.5%, /* Orange */
+        #ffff00 25%,   /* Yellow */
+        #00ff00 37.5%, /* Green */
+        #00ffff 50%,   /* Cyan */
+        #0000ff 62.5%, /* Blue */
+        #8b00ff 75%,   /* Violet */
+        #ff00ff 87.5%, /* Magenta */
+        #ff0000 100%   /* Red - loop back */
+    );
     background-size: 400% 400%;
-    animation: gradientFlow 10s ease infinite;
+    animation: rainbowFlow 8s ease infinite;
     padding: 25px 20px;
     margin-bottom: 25px;
     border-radius: var(--radius);
-    box-shadow: var(--shadow);
+    box-shadow: 
+        0 10px 25px -5px rgba(0,0,0,0.3),
+        0 8px 10px -6px rgba(0,0,0,0.2),
+        inset 0 0 30px rgba(255,255,255,0.2);
     text-align: center;
     position: relative;
     overflow: hidden;
+    border: 3px solid transparent;
+    background-clip: padding-box;
 }
 
 .header::before {
@@ -86,18 +102,24 @@ html,body{
 }
 
 .logo {
-    height: 80px;
-    width: 80px;
+    height: 90px;
+    width: 90px;
     border-radius: 50%;
-    border: 3px solid rgba(255,255,255,0.95);
+    border: 4px solid rgba(255,255,255,0.9);
     background: white;
-    padding: 6px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    transition: transform 0.3s ease;
+    padding: 8px;
+    box-shadow: 
+        0 5px 20px rgba(0,0,0,0.4),
+        0 0 40px rgba(255,255,255,0.3);
+    transition: all 0.5s ease;
+    animation: logoSpin 10s linear infinite;
 }
 
 .logo:hover {
-    transform: scale(1.05);
+    transform: scale(1.1) rotate(180deg);
+    box-shadow: 
+        0 10px 30px rgba(0,0,0,0.6),
+        0 0 60px rgba(255,255,255,0.5);
 }
 
 .header h1 {
@@ -106,9 +128,11 @@ html,body{
     font-weight: 900;
     color: white;
     text-shadow: 
-        3px 3px 6px rgba(0,0,0,0.4),
-        0 0 30px rgba(255,255,255,0.3);
-    letter-spacing: 1.5px;
+        3px 3px 8px rgba(0,0,0,0.6),
+        0 0 30px rgba(255,255,255,0.5),
+        0 0 60px rgba(255,255,255,0.3);
+    letter-spacing: 2px;
+    animation: textColorCycle 4s ease infinite;
 }
 
 .header .subtitle {
@@ -215,6 +239,82 @@ html,body{
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+/* 8 Color Rainbow Animations */
+@keyframes rainbowFlow {
+    0% {
+        background-position: 0% 0%;
+        border-image: linear-gradient(135deg, #ff0000, #ff8800, #ffff00, #00ff00, #00ffff, #0000ff, #8b00ff, #ff00ff) 1;
+    }
+    25% {
+        background-position: 100% 0%;
+        border-image: linear-gradient(135deg, #ff00ff, #ff0000, #ff8800, #ffff00, #00ff00, #00ffff, #0000ff, #8b00ff) 1;
+    }
+    50% {
+        background-position: 100% 100%;
+        border-image: linear-gradient(135deg, #8b00ff, #ff00ff, #ff0000, #ff8800, #ffff00, #00ff00, #00ffff, #0000ff) 1;
+    }
+    75% {
+        background-position: 0% 100%;
+        border-image: linear-gradient(135deg, #0000ff, #8b00ff, #ff00ff, #ff0000, #ff8800, #ffff00, #00ff00, #00ffff) 1;
+    }
+    100% {
+        background-position: 0% 0%;
+        border-image: linear-gradient(135deg, #00ffff, #0000ff, #8b00ff, #ff00ff, #ff0000, #ff8800, #ffff00, #00ff00) 1;
+    }
+}
+
+@keyframes textColorCycle {
+    0% { 
+        color: #ff0000;
+        text-shadow: 3px 3px 8px rgba(255,0,0,0.6), 0 0 30px rgba(255,0,0,0.5);
+    }
+    14% { 
+        color: #ff8800;
+        text-shadow: 3px 3px 8px rgba(255,136,0,0.6), 0 0 30px rgba(255,136,0,0.5);
+    }
+    28% { 
+        color: #ffff00;
+        text-shadow: 3px 3px 8px rgba(255,255,0,0.6), 0 0 30px rgba(255,255,0,0.5);
+    }
+    42% { 
+        color: #00ff00;
+        text-shadow: 3px 3px 8px rgba(0,255,0,0.6), 0 0 30px rgba(0,255,0,0.5);
+    }
+    56% { 
+        color: #00ffff;
+        text-shadow: 3px 3px 8px rgba(0,255,255,0.6), 0 0 30px rgba(0,255,255,0.5);
+    }
+    70% { 
+        color: #0000ff;
+        text-shadow: 3px 3px 8px rgba(0,0,255,0.6), 0 0 30px rgba(0,0,255,0.5);
+    }
+    84% { 
+        color: #8b00ff;
+        text-shadow: 3px 3px 8px rgba(139,0,255,0.6), 0 0 30px rgba(139,0,255,0.5);
+    }
+    100% { 
+        color: #ff00ff;
+        text-shadow: 3px 3px 8px rgba(255,0,255,0.6), 0 0 30px rgba(255,0,255,0.5);
+    }
+}
+
+@keyframes logoSpin {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(90deg); }
+    50% { transform: rotate(180deg); }
+    75% { transform: rotate(270deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes particlesFloat {
+    0% {
+        background-position: 0% 0%;
+    }
+    100% {
+        background-position: 200% 200%;
+    }
 }
 
 /* Stats Grid */
@@ -847,17 +947,12 @@ tr:hover {
 {% else %}
 
 <div class="container">
-    <!-- Modern Header - Rainbow Gradient -->
+    <!-- Modern Header - 8 Color Rainbow Flow Gradient -->
 <header class="header">
     <div class="header-content">
         <div class="logo-container">
             <img src="{{ logo }}" alt="ZIVPN" class="logo">
-            <div style="text-align: left;">
-                <h1>မောင်သုည ZIVPN ENTERPRISE</h1>
-                <div class="subtitle" style="margin-top: 8px; font-size: 1.1em;">
-        ⚡ Premium VPN Management System
-                </div>
-            </div>
+            <h1>မောင်သုည ZIVPN ENTERPRISE</h1>
         </div>
         <div class="subtitle">
             <span><i class="fas fa-shield-alt"></i> Secure</span>
