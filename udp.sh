@@ -848,13 +848,17 @@ def edit_expiry():
 @app.route("/delete", methods=["POST"])
 def delete_user_html():
     t = g.t
-    if not require_login(): return redirect(url_for('login'))
+    if not require_login(): 
+        return redirect(url_for('login'))
+    
     user = (request.form.get("user") or "").strip()
-    if not user: return build_view(err=t['required_fields'])
+    if not user: 
+        return redirect(url_for('index'))  # ✨ Method Not Allowed fixed
     
     delete_user(user)
     sync_config_passwords(mode="mirror")
-    return build_view(msg=t['deleted'].format(user=user))
+    
+    return redirect(url_for('index'))  # ✨ Method Not Allowed fixed
 
 @app.route("/suspend", methods=["POST"])
 def suspend_user():
