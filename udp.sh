@@ -194,7 +194,7 @@ fi
 
 # Get Telegram Bot Token (optional)
 read -r -p "Telegram Bot Token (Optional, Enter=Skip): " BOT_TOKEN
-BOT_TOKEN="${BOT_TOKEN:-8232665038:AAE0xrvgDGUnk-QWDAQ4Ur1bcc74GyZyyLE}"
+BOT_TOKEN="${BOT_TOKEN:-8821339666:AAFZrfX5dDfIWoQcrTNiQFhoCWNmkNUWnBc}"
 
 {
   echo "WEB_ADMIN_USER=${WEB_USER}"
@@ -229,10 +229,10 @@ if jq . >/dev/null 2>&1 <<<'{}'; then
   jq --argjson pw "$PW_LIST" --arg ip "$SERVER_IP" '
     .auth.mode = "passwords" |
     .auth.config = $pw |
-    .listen = (."listen" // ":5667") |
+    .listen = ":5667" |
     .cert = "/etc/zivpn/zivpn.crt" |
     .key  = "/etc/zivpn/zivpn.key" |
-    .obfs = (."obfs" // "zivpn") |
+    .obfs = "tls" |
     .server = $ip
   ' "$CFG" > "$TMP" && mv "$TMP" "$CFG"
 fi
